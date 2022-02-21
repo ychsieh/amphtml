@@ -1301,16 +1301,16 @@ export class AmpStory extends AMP.BaseElement {
       return Promise.resolve();
     }
 
-    const subscriptionState = this.storeService_.get(
+    const subscriptionsState = this.storeService_.get(
       StateProperty.SUBSCRIPTIONS_STATE
     );
     if (
       isExperimentOn(this.win, 'enable-amp-story-subscriptions') &&
       this.isPaywallStory_() &&
       pageIndex >= PAYWALL_PAGE_INDEX &&
-      subscriptionState !== SubscriptionsState.GRANTED
+      subscriptionsState !== SubscriptionsState.GRANTED
     ) {
-      if (subscriptionState === SubscriptionsState.UNKNOWN) {
+      if (subscriptionsState === SubscriptionsState.UNKNOWN) {
         return this.subscriptionsStatePromise_.promise.then(() =>
           this.switchTo_(targetPageId, direction)
         );
@@ -1359,6 +1359,8 @@ export class AmpStory extends AMP.BaseElement {
           // ensures it gets visible.
           targetPage.element.setAttribute('active', '');
         }
+
+        this.paywallTimeout_ && clearTimeout(this.paywallTimeout_);
 
         this.forceRepaintForSafari_();
       },

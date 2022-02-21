@@ -71,14 +71,15 @@ export class AmpStorySubscriptions extends AMP.BaseElement {
       this.localizationService_ = localizationService;
 
       this.subscriptionService_ = subscriptionService;
-      this.subscriptionService_
-        .getGrantStatus()
-        .then((granted) => this.handleGrantStatusUpdate_(granted));
-      this.subscriptionService_.addOnEntitlementResolvedCallback((e) => {
-        // When the user finishes any of the actions, e.g. log in or subscribe, this callback would be executed.
-        // If the new response is granted from publisher backend, disable paywall and update states.
-        const {entitlement} = e;
-        this.handleGrantStatusUpdate_(entitlement.granted);
+      this.subscriptionService_.getGrantStatus().then((granted) => {
+        this.handleGrantStatusUpdate_(granted);
+      });
+      this.subscriptionService_.addOnEntitlementResolvedCallback(() => {
+        // When the user finishes any of the actions, e.g. log in or subscribe, new entitlements would be
+        // re-fetched and this callback would be executed. Update states based on new entitlements.
+        this.subscriptionService_.getGrantStatus().then((granted) => {
+          this.handleGrantStatusUpdate_(granted);
+        });
       });
 
       // Create a paywall dialog element that have required attributes to be able to be
@@ -217,7 +218,7 @@ export class AmpStorySubscriptions extends AMP.BaseElement {
    */
   onSubscriptionsStateChange_(subscriptionsState) {
     if (
-      subscriptionsState == SubscriptionsState.GRANTED &&
+      subscriptionsState === SubscriptionsState.GRANTED &&
       this.storeService_.get(StateProperty.SUBSCRIPTIONS_DIALOG_UI_STATE)
     ) {
       this.storeService_.dispatch(

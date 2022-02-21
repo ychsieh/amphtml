@@ -470,7 +470,7 @@ const actions = (state, action, data) => {
     case Action.TOGGLE_SUBSCRIPTIONS_STATE:
       return /** @type {!State} */ ({
         ...state,
-        [StateProperty.SUBSCRIPTIONS_STATE]: !!data,
+        [StateProperty.SUBSCRIPTIONS_STATE]: data,
       });
     default:
       dev().error(TAG, 'Unknown action %s.', action);
